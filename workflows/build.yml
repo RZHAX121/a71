@@ -1,0 +1,30 @@
+name: Build Samsung A71 UEFI
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential uuid-dev iasl git nasm python3 python3-distutils gcc-aarch64-linux-gnu
+
+      - name: Build UEFI
+        run: |
+          chmod +x build.sh
+          ./build.sh --device Samsung/sm7150/a71
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: a71-uefi
+          path: Build/a71/RELEASE_CLANGDWARF/FV/*.fd
